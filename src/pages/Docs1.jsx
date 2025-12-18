@@ -81,7 +81,7 @@ export default function Docs() {
             </Button>
           </div>
           <div className="hidden lg:flex gap-2">
-            <Button variant="outline" onClick={() => navigate("/dashboard")}>Dashboard</Button>
+            <Button variant="outline" onClick={() => navigate("/dashboard")} className=" bg-gray-400">Dashboard</Button>
             <Button className="bg-yellow-400 text-black hover:shadow-lg" onClick={() => navigate("/plans")}>Pricing</Button>
           </div>
         </div>
