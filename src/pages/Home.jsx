@@ -29,13 +29,16 @@ import {
   Smartphone,
   Lock,
   RefreshCw,
-  ArrowRight
+  ArrowRight,
+  Menu,
+  X
 } from "lucide-react";
 
 export default function Home() {
   const navigate = useNavigate();
   const [scrollY, setScrollY] = useState(0);
   const [isHovered, setIsHovered] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const heroRef = useRef(null);
   const featuresRef = useRef(null);
   const statsRef = useRef(null);
@@ -49,6 +52,17 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Close mobile menu on resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isMobileMenuOpen]);
 
   // Animation Variants
   const cardVariants = {
@@ -148,6 +162,9 @@ export default function Home() {
     }
   ];
 
+  // Navigation items
+  const navItems = ["Docs", "Plans", "Feedback", "Queries", "Experience"];
+
   return (
     <div className="min-h-screen bg-black text-white font-inter overflow-x-hidden">
       {/* ================= ANIMATED BACKGROUND ELEMENTS ================= */}
@@ -155,7 +172,7 @@ export default function Home() {
         {[...Array(20)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-yellow-400/20 rounded-full"
+            className="absolute w-1 h-1 bg-yellow-400/20 rounded-full hidden sm:block"
             initial={{
               x: Math.random() * 100 + 'vw',
               y: Math.random() * 100 + 'vh'
@@ -173,20 +190,92 @@ export default function Home() {
         ))}
       </div>
 
+      {/* ================= MOBILE MENU OVERLAY ================= */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isMobileMenuOpen ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+        className={`fixed inset-0 bg-black/90 backdrop-blur-lg z-50 md:hidden ${
+          isMobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'
+        }`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        <motion.div
+          initial={{ x: '100%' }}
+          animate={{ x: isMobileMenuOpen ? 0 : '100%' }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="absolute right-0 top-0 h-full w-3/4 bg-gray-900/95 backdrop-blur-xl p-8 border-l border-gray-800"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-center mb-12">
+            <h1 className="text-2xl font-bold text-yellow-400">DocXtract</h1>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 hover:bg-gray-800 rounded-lg"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+          
+          <div className="space-y-6">
+            {navItems.map((item) => (
+              <motion.div
+                key={item}
+                initial={{ x: 50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: navItems.indexOf(item) * 0.1 }}
+              >
+                <Link
+                  to={`/${item.toLowerCase()}`}
+                  className="block text-2xl font-medium text-gray-300 hover:text-yellow-400 py-4 border-b border-gray-800"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="absolute bottom-8 left-8 right-8 space-y-4">
+            <Button
+              className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black py-6 text-lg"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                navigate("/register");
+              }}
+            >
+              <Zap className="w-5 h-5 mr-2" />
+              Get Started Free
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full border-gray-700 text-white py-6 text-lg"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                navigate("/login");
+              }}
+            >
+              Login
+            </Button>
+          </div>
+        </motion.div>
+      </motion.div>
+
       {/* ================= HEADER ================= */}
       <motion.header 
-        className="sticky top-0 z-50 w-full bg-black/80 backdrop-blur-lg py-4 border-b border-gray-800"
+        className="sticky top-0 z-40 w-full bg-black/80 backdrop-blur-lg py-4 border-b border-gray-800"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6">
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2"
           >
-            <h1 className="text-3xl font-extrabold text-yellow-400 tracking-wide flex items-center gap-2">
-              <Sparkles className="w-6 h-6" />
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-yellow-400 tracking-wide flex items-center gap-2">
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
               DocXtract
               <motion.span
                 animate={pulseAnimation}
@@ -197,14 +286,15 @@ export default function Home() {
             </h1>
           </motion.div>
 
-          <NavigationMenu>
-            <NavigationMenuList className="hidden md:flex gap-8 text-gray-300">
-              {["Docs", "Plans", "Feedback", "Queries", "Experience"].map((item) => (
+          {/* Desktop Navigation */}
+          <NavigationMenu className="hidden md:block">
+            <NavigationMenuList className="gap-6 lg:gap-8 text-gray-300">
+              {navItems.map((item) => (
                 <NavigationMenuItem key={item}>
                   <motion.div whileHover={{ y: -2 }}>
                     <Link 
                       to={`/${item.toLowerCase()}`} 
-                      className="hover:text-yellow-400 transition-colors flex items-center gap-1"
+                      className="hover:text-yellow-400 transition-colors flex items-center gap-1 text-sm lg:text-base"
                     >
                       {item}
                       <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -215,11 +305,20 @@ export default function Home() {
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="flex items-center gap-4">
-            <motion.div whileHover={{ scale: 1.05 }}>
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-2 hover:bg-gray-800 rounded-lg"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+
+            {/* Desktop Buttons */}
+            <motion.div whileHover={{ scale: 1.05 }} className="hidden md:block">
               <Button
                 variant="ghost"
-                className="text-gray-300 hover:text-yellow-400 border border-gray-700"
+                className="text-gray-300 hover:text-yellow-400 border border-gray-700 text-sm lg:text-base"
                 onClick={() => navigate("/login")}
               >
                 Login
@@ -228,13 +327,14 @@ export default function Home() {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              className="hidden md:block"
             >
               <Button
-                className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:from-yellow-500 hover:to-orange-600 shadow-lg shadow-yellow-400/25"
+                className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:from-yellow-500 hover:to-orange-600 shadow-lg shadow-yellow-400/25 text-sm lg:text-base"
                 onClick={() => navigate("/register")}
               >
                 <Zap className="w-4 h-4 mr-2" />
-                Get Started Free
+                Get Started
               </Button>
             </motion.div>
           </div>
@@ -242,27 +342,27 @@ export default function Home() {
       </motion.header>
 
       {/* ================= HERO SECTION ================= */}
-      <section ref={heroRef} className="h-screen flex flex-col justify-center max-w-7xl mx-auto px-6 text-center relative">
+      <section ref={heroRef} className="min-h-screen flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 text-center relative py-20">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1 }}
-          className="absolute top-20 right-20 w-64 h-64 bg-yellow-400/10 rounded-full blur-3xl"
+          className="absolute top-10 sm:top-20 right-4 sm:right-20 w-32 h-32 sm:w-64 sm:h-64 bg-yellow-400/10 rounded-full blur-3xl"
         />
         
         <motion.h2
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-6xl md:text-7xl lg:text-8xl font-extrabold text-gray-100 leading-tight"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold text-gray-100 leading-tight"
         >
           <span className="relative inline-block">
             Extract
             <motion.span
               animate={floatingAnimation}
-              className="absolute -top-8 -right-8"
+              className="absolute -top-6 -right-6 sm:-top-8 sm:-right-8"
             >
-              <Sparkles className="w-12 h-12 text-yellow-400" />
+              <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-yellow-400" />
             </motion.span>
           </span>
           <br />
@@ -275,7 +375,7 @@ export default function Home() {
               scale: [1, 1.1, 1]
             }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="inline-block ml-4"
+            className="inline-block ml-2 sm:ml-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
           >
             Instantly
           </motion.span>
@@ -285,7 +385,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="mt-6 max-w-3xl mx-auto text-gray-400 text-xl md:text-2xl"
+          className="mt-4 sm:mt-6 max-w-3xl mx-auto text-gray-400 text-lg sm:text-xl md:text-2xl px-4"
         >
           Upload PDFs, images, receipts, invoices, IDs & more — our AI instantly
           extracts structured data with <span className="text-yellow-400 font-semibold">99.7% accuracy</span>.
@@ -295,50 +395,52 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.8 }}
-          className="flex flex-col sm:flex-row justify-center items-center mt-12 gap-6"
+          className="flex flex-col sm:flex-row justify-center items-center mt-8 sm:mt-12 gap-4 sm:gap-6 px-4"
         >
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            className="w-full sm:w-auto"
           >
             <Button
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-10 py-6 text-xl hover:shadow-2xl hover:shadow-yellow-400/30 rounded-2xl group"
+              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 sm:px-8 md:px-10 py-5 sm:py-6 text-lg sm:text-xl hover:shadow-2xl hover:shadow-yellow-400/30 rounded-xl sm:rounded-2xl group w-full"
               onClick={() => navigate("/login")}
             >
-              <Zap className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform" />
+              <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 group-hover:rotate-12 transition-transform" />
               Try Now - It's Free
-              <ArrowRight className="w-5 h-5 ml-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 sm:ml-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all" />
             </Button>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            className="w-full sm:w-auto"
           >
             <Button
               variant="outline"
-              className="text-white border-gray-600 bg-gray-900/50 hover:bg-gray-800 px-10 py-6 text-xl rounded-2xl group"
+              className="text-white border-gray-600 bg-gray-900/50 hover:bg-gray-800 px-6 sm:px-8 md:px-10 py-5 sm:py-6 text-lg sm:text-xl rounded-xl sm:rounded-2xl group w-full"
               onClick={() => navigate("/docs")}
             >
-              <FileText className="w-6 h-6 mr-3" />
+              <FileText className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
               View Live Demo
             </Button>
           </motion.div>
         </motion.div>
 
-        {/* Floating preview cards */}
+        {/* Floating preview cards - Hidden on mobile, shown on medium+ */}
         <motion.div
           animate={floatingAnimation}
-          className="absolute bottom-10 left-10 hidden lg:block"
+          className="absolute bottom-4 left-4 hidden md:block"
         >
-          <div className="bg-gray-900/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-700 w-64">
+          <div className="bg-gray-900/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-700 w-56 lg:w-64">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
                 <CheckCircle className="w-6 h-6 text-green-400" />
               </div>
               <div>
-                <p className="font-semibold">Invoice Processed</p>
-                <p className="text-sm text-gray-400">Just now</p>
+                <p className="font-semibold text-sm lg:text-base">Invoice Processed</p>
+                <p className="text-xs lg:text-sm text-gray-400">Just now</p>
               </div>
             </div>
           </div>
@@ -349,16 +451,16 @@ export default function Home() {
             y: [0, -15, 0],
             transition: { duration: 3, repeat: Infinity, delay: 1 }
           }}
-          className="absolute bottom-20 right-10 hidden lg:block"
+          className="absolute bottom-8 right-4 hidden md:block"
         >
-          <div className="bg-gray-900/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-700 w-64">
+          <div className="bg-gray-900/80 backdrop-blur-sm p-4 rounded-2xl border border-gray-700 w-56 lg:w-64">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
                 <Download className="w-6 h-6 text-blue-400" />
               </div>
               <div>
-                <p className="font-semibold">Data Extracted</p>
-                <p className="text-sm text-gray-400">15 fields detected</p>
+                <p className="font-semibold text-sm lg:text-base">Data Extracted</p>
+                <p className="text-xs lg:text-sm text-gray-400">15 fields detected</p>
               </div>
             </div>
           </div>
@@ -372,10 +474,10 @@ export default function Home() {
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
         ref={statsRef}
-        className="py-12 bg-gradient-to-r from-gray-900 to-black border-y border-gray-800"
+        className="py-8 sm:py-12 bg-gradient-to-r from-gray-900 to-black border-y border-gray-800"
       >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 gap-4 sm:gap-8">
             {stats.map((stat, i) => (
               <motion.div
                 key={i}
@@ -384,15 +486,15 @@ export default function Home() {
                 transition={{ delay: i * 0.1 }}
                 viewport={{ once: true }}
                 whileHover={{ y: -5 }}
-                className="text-center group"
+                className="text-center group p-4"
               >
-                <div className="flex justify-center mb-4">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-gray-800 to-black border border-gray-700 group-hover:border-yellow-400/50 transition-colors">
+                <div className="flex justify-center mb-2 sm:mb-4">
+                  <div className="p-2 sm:p-3 rounded-xl bg-gradient-to-br from-gray-800 to-black border border-gray-700 group-hover:border-yellow-400/50 transition-colors">
                     {stat.icon}
                   </div>
                 </div>
-                <p className="text-3xl md:text-4xl font-bold text-yellow-400">{stat.value}</p>
-                <p className="text-gray-400 mt-2">{stat.label}</p>
+                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400">{stat.value}</p>
+                <p className="text-gray-400 text-sm sm:text-base mt-1 sm:mt-2">{stat.label}</p>
               </motion.div>
             ))}
           </div>
@@ -400,27 +502,27 @@ export default function Home() {
       </motion.section>
 
       {/* ================= FEATURES ================= */}
-      <section ref={featuresRef} className="py-32 bg-gradient-to-b from-black to-gray-900">
-        <div className="max-w-7xl mx-auto px-6">
+      <section ref={featuresRef} className="py-16 sm:py-24 md:py-32 bg-gradient-to-b from-black to-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-20"
+            className="text-center mb-12 sm:mb-20"
           >
-            <span className="inline-block px-4 py-2 bg-yellow-400/10 text-yellow-400 rounded-full text-sm font-semibold mb-4">
+            <span className="inline-block px-3 py-1 sm:px-4 sm:py-2 bg-yellow-400/10 text-yellow-400 rounded-full text-xs sm:text-sm font-semibold mb-3 sm:mb-4">
               POWERFUL FEATURES
             </span>
-            <h3 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
               Why <span className="text-yellow-400">thousands of teams</span> choose DocXtract
             </h3>
-            <p className="text-gray-400 text-xl max-w-3xl mx-auto">
+            <p className="text-gray-400 text-base sm:text-lg md:text-xl max-w-3xl mx-auto px-4">
               Everything you need for seamless document processing and data extraction
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {featureCards.map((item, i) => (
               <motion.div
                 key={i}
@@ -428,36 +530,36 @@ export default function Home() {
                 variants={cardVariants}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
+                viewport={{ once: true, amount: 0.1 }}
                 whileHover={{ 
-                  y: -12, 
+                  y: -8, 
                   transition: { duration: 0.3 } 
                 }}
                 onMouseEnter={() => setIsHovered(i)}
                 onMouseLeave={() => setIsHovered(null)}
                 className="relative group"
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-10 rounded-3xl blur-xl transition-opacity duration-500`} />
-                <Card className="bg-gray-900/50 border-gray-800 backdrop-blur-sm p-8 rounded-3xl relative overflow-hidden transition-all duration-300 group-hover:border-yellow-400/30">
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-gray-800 to-transparent rounded-full -translate-y-10 translate-x-10" />
+                <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-10 rounded-xl sm:rounded-2xl lg:rounded-3xl blur-xl transition-opacity duration-500`} />
+                <Card className="bg-gray-900/50 border-gray-800 backdrop-blur-sm p-6 sm:p-8 rounded-xl sm:rounded-2xl lg:rounded-3xl relative overflow-hidden transition-all duration-300 group-hover:border-yellow-400/30 h-full">
+                  <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-gray-800 to-transparent rounded-full -translate-y-8 translate-x-8 sm:-translate-y-10 sm:translate-x-10" />
                   
-                  <CardHeader className="pb-6">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-6 text-white shadow-lg`}>
+                  <CardHeader className="pb-4 sm:pb-6">
+                    <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4 sm:mb-6 text-white shadow-lg`}>
                       {item.icon}
                     </div>
-                    <CardTitle className="text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors">
+                    <CardTitle className="text-xl sm:text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors">
                       {item.title}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-400 text-lg leading-relaxed">
+                    <p className="text-gray-400 text-sm sm:text-base lg:text-lg leading-relaxed">
                       {item.text}
                     </p>
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: isHovered === i ? "100%" : "0%" }}
                       transition={{ duration: 0.3 }}
-                      className="h-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 mt-6"
+                      className="h-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 mt-4 sm:mt-6"
                     />
                   </CardContent>
                 </Card>
@@ -468,59 +570,59 @@ export default function Home() {
       </section>
 
       {/* ================= INTERACTIVE DEMO PREVIEW ================= */}
-      <section className="py-24 bg-black">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-16 sm:py-24 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 1 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12 sm:mb-16"
           >
-            <h3 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
               See it in <span className="text-yellow-400">action</span>
             </h3>
-            <p className="text-gray-400 text-xl max-w-2xl mx-auto">
+            <p className="text-gray-400 text-base sm:text-lg md:text-xl max-w-2xl mx-auto px-4">
               Watch how DocXtract transforms documents into structured data in seconds
             </p>
           </motion.div>
 
           <div className="relative max-w-6xl mx-auto">
-            <div className="bg-gradient-to-r from-gray-900 via-black to-gray-900 rounded-3xl border border-gray-800 p-2">
-              <div className="bg-gray-900 rounded-2xl p-8 md:p-12">
-                <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="bg-gradient-to-r from-gray-900 via-black to-gray-900 rounded-xl sm:rounded-2xl lg:rounded-3xl border border-gray-800 p-2">
+              <div className="bg-gray-900 rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-12">
+                <div className="grid md:grid-cols-2 gap-8 sm:gap-12 items-center">
                   <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8 }}
                     viewport={{ once: true }}
                   >
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-yellow-400/10 flex items-center justify-center">
-                          <Upload className="w-6 h-6 text-yellow-400" />
+                    <div className="space-y-4 sm:space-y-6">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-yellow-400/10 flex items-center justify-center">
+                          <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
                         </div>
                         <div>
-                          <h4 className="text-xl font-semibold text-white">Upload Document</h4>
-                          <p className="text-gray-400">Drag & drop or click to upload</p>
+                          <h4 className="text-lg sm:text-xl font-semibold text-white">Upload Document</h4>
+                          <p className="text-gray-400 text-sm sm:text-base">Drag & drop or click to upload</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-blue-400/10 flex items-center justify-center">
-                          <Sparkles className="w-6 h-6 text-blue-400" />
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-blue-400/10 flex items-center justify-center">
+                          <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                         </div>
                         <div>
-                          <h4 className="text-xl font-semibold text-white">AI Processing</h4>
-                          <p className="text-gray-400">Our AI analyzes and extracts data</p>
+                          <h4 className="text-lg sm:text-xl font-semibold text-white">AI Processing</h4>
+                          <p className="text-gray-400 text-sm sm:text-base">Our AI analyzes and extracts data</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-green-400/10 flex items-center justify-center">
-                          <Download className="w-6 h-6 text-green-400" />
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-green-400/10 flex items-center justify-center">
+                          <Download className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
                         </div>
                         <div>
-                          <h4 className="text-xl font-semibold text-white">Get Results</h4>
-                          <p className="text-gray-400">Download structured data in JSON/CSV</p>
+                          <h4 className="text-lg sm:text-xl font-semibold text-white">Get Results</h4>
+                          <p className="text-gray-400 text-sm sm:text-base">Download structured data in JSON/CSV</p>
                         </div>
                       </div>
                     </div>
@@ -531,18 +633,18 @@ export default function Home() {
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
                     viewport={{ once: true }}
-                    className="relative"
+                    className="relative mt-8 md:mt-0"
                   >
-                    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-3 h-3 rounded-full bg-red-500" />
-                          <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                          <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <div className="bg-gray-800 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-700">
+                      <div className="flex items-center justify-between mb-4 sm:mb-6">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500" />
+                          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-yellow-500" />
+                          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500" />
                         </div>
-                        <span className="text-sm text-gray-400">processing.json</span>
+                        <span className="text-xs sm:text-sm text-gray-400">processing.json</span>
                       </div>
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         {[
                           { label: "Document Type", value: "Invoice", color: "text-green-400" },
                           { label: "Total Amount", value: "$1,250.00", color: "text-yellow-400" },
@@ -556,7 +658,7 @@ export default function Home() {
                             whileInView={{ opacity: 1, x: 0 }}
                             transition={{ delay: i * 0.1 + 0.5 }}
                             viewport={{ once: true }}
-                            className="flex justify-between items-center p-3 bg-gray-900/50 rounded-lg"
+                            className="flex justify-between items-center p-2 sm:p-3 bg-gray-900/50 rounded-lg text-sm sm:text-base"
                           >
                             <span className="text-gray-400">{item.label}</span>
                             <span className={`font-semibold ${item.color}`}>{item.value}</span>
@@ -573,7 +675,7 @@ export default function Home() {
                         ]
                       }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className="absolute -inset-4 rounded-3xl border border-yellow-400/30 pointer-events-none"
+                      className="absolute -inset-2 sm:-inset-4 rounded-xl sm:rounded-2xl lg:rounded-3xl border border-yellow-400/30 pointer-events-none"
                     />
                   </motion.div>
                 </div>
@@ -584,25 +686,25 @@ export default function Home() {
       </section>
 
       {/* ================= TESTIMONIALS ================= */}
-      <section className="py-24 bg-gradient-to-b from-black to-gray-900">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-16 sm:py-24 bg-gradient-to-b from-black to-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12 sm:mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400/10 rounded-full mb-6">
-              <Star className="w-4 h-4 text-yellow-400" />
-              <span className="text-yellow-400 text-sm font-semibold">TRUSTED BY INDUSTRY LEADERS</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-yellow-400/10 rounded-full mb-4 sm:mb-6">
+              <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
+              <span className="text-yellow-400 text-xs sm:text-sm font-semibold">TRUSTED BY INDUSTRY LEADERS</span>
             </div>
-            <h3 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
               Loved by teams worldwide
             </h3>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {testimonials.map((testimonial, i) => (
               <motion.div
                 key={i}
@@ -611,21 +713,21 @@ export default function Home() {
                 transition={{ delay: i * 0.2 }}
                 viewport={{ once: true }}
                 whileHover={{ y: -8 }}
-                className="bg-gray-900/50 border border-gray-800 rounded-3xl p-8 backdrop-blur-sm"
+                className="bg-gray-900/50 border border-gray-800 rounded-xl sm:rounded-2xl lg:rounded-3xl p-6 sm:p-8 backdrop-blur-sm"
               >
-                <div className="flex items-center gap-1 mb-6">
+                <div className="flex items-center gap-1 mb-4 sm:mb-6">
                   {[...Array(testimonial.rating)].map((_, j) => (
-                    <Star key={j} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                    <Star key={j} className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 fill-yellow-400" />
                   ))}
                 </div>
-                <p className="text-gray-300 text-lg italic mb-8">"{testimonial.content}"</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-black font-bold">
+                <p className="text-gray-300 text-base sm:text-lg italic mb-6 sm:mb-8">"{testimonial.content}"</p>
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-black font-bold text-sm sm:text-base">
                     {testimonial.name.charAt(0)}
                   </div>
                   <div>
-                    <h4 className="font-bold text-white">{testimonial.name}</h4>
-                    <p className="text-gray-400 text-sm">{testimonial.role}</p>
+                    <h4 className="font-bold text-white text-sm sm:text-base">{testimonial.name}</h4>
+                    <p className="text-gray-400 text-xs sm:text-sm">{testimonial.role}</p>
                   </div>
                 </div>
               </motion.div>
@@ -635,24 +737,24 @@ export default function Home() {
       </section>
 
       {/* ================= SUBSCRIPTION SECTION ================= */}
-      <section className="py-32 bg-black">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-16 sm:py-24 md:py-32 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12 sm:mb-16"
           >
-            <h3 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
               Simple, transparent <span className="text-yellow-400">pricing</span>
             </h3>
-            <p className="text-gray-400 text-xl max-w-2xl mx-auto">
+            <p className="text-gray-400 text-base sm:text-lg md:text-xl max-w-2xl mx-auto px-4">
               Choose the plan that fits your needs. No hidden fees, no surprises.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
             {[
               {
                 title: "Free",
@@ -716,35 +818,35 @@ export default function Home() {
                 variants={cardVariants}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
+                viewport={{ once: true, amount: 0.1 }}
                 whileHover={{ y: -10 }}
-                className={`relative rounded-3xl border-2 p-8 ${
+                className={`relative rounded-xl sm:rounded-2xl lg:rounded-3xl border-2 p-6 ${
                   plan.popular 
                     ? 'border-yellow-400 bg-gradient-to-b from-gray-900 to-black' 
                     : 'border-gray-800 bg-gray-900/50'
                 } backdrop-blur-sm`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-2 rounded-full text-sm font-bold">
+                  <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2">
+                    <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold">
                       MOST POPULAR
                     </span>
                   </div>
                 )}
                 
-                <div className="text-center mb-8">
-                  <h4 className="text-2xl font-bold text-white mb-4">{plan.title}</h4>
+                <div className="text-center mb-6 sm:mb-8">
+                  <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-3 sm:mb-4">{plan.title}</h4>
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="text-4xl md:text-5xl font-bold text-white">{plan.price}</span>
-                    {plan.price !== "Custom" && <span className="text-gray-400">/mo</span>}
+                    <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white">{plan.price}</span>
+                    {plan.price !== "Custom" && <span className="text-gray-400 text-sm sm:text-base">/mo</span>}
                   </div>
-                  <p className="text-gray-400">{plan.period}</p>
+                  <p className="text-gray-400 text-sm sm:text-base">{plan.period}</p>
                 </div>
 
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                   {plan.features.map((feature, j) => (
-                    <li key={j} className="flex items-center gap-3 text-gray-300">
-                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                    <li key={j} className="flex items-start gap-2 sm:gap-3 text-gray-300 text-sm sm:text-base">
+                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0 mt-0.5" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -755,7 +857,7 @@ export default function Home() {
                   whileTap={{ scale: 0.95 }}
                 >
                   <Button
-                    className={`w-full py-6 text-lg rounded-xl font-semibold ${
+                    className={`w-full py-4 sm:py-6 text-sm sm:text-lg rounded-lg sm:rounded-xl font-semibold ${
                       plan.popular
                         ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:shadow-2xl hover:shadow-yellow-400/30'
                         : 'bg-gray-800 text-white hover:bg-gray-700'
@@ -772,22 +874,22 @@ export default function Home() {
       </section>
 
       {/* ================= CTA ================= */}
-      <section ref={ctaRef} className="relative py-32 overflow-hidden">
+      <section ref={ctaRef} className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 via-orange-500/5 to-transparent" />
-        <div className="max-w-6xl mx-auto px-6 text-center relative z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-br from-gray-900 to-black rounded-3xl border border-gray-800 p-12 md:p-16"
+            className="bg-gradient-to-br from-gray-900 to-black rounded-xl sm:rounded-2xl lg:rounded-3xl border border-gray-800 p-8 sm:p-12 md:p-16"
           >
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-6xl font-bold text-white mb-6"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6"
             >
               Ready to transform your
               <span className="block text-yellow-400">document workflow?</span>
@@ -798,7 +900,7 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
               viewport={{ once: true }}
-              className="text-gray-400 text-xl mb-10 max-w-2xl mx-auto"
+              className="text-gray-400 text-base sm:text-lg md:text-xl mb-8 sm:mb-10 max-w-2xl mx-auto"
             >
               Join thousands of teams automating their document processing. No credit card required to start.
             </motion.p>
@@ -808,17 +910,18 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
               viewport={{ once: true }}
-              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+              className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center"
             >
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
               >
                 <Button
-                  className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:shadow-2xl hover:shadow-yellow-400/30 px-10 py-7 text-xl rounded-2xl font-bold"
+                  className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:shadow-2xl hover:shadow-yellow-400/30 px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-7 text-base sm:text-lg md:text-xl rounded-xl sm:rounded-2xl font-bold w-full"
                   onClick={() => navigate("/register")}
                 >
-                  <Zap className="w-6 h-6 mr-3" />
+                  <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
                   Start Free
                 </Button>
               </motion.div>
@@ -826,13 +929,14 @@ export default function Home() {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
               >
                 <Button
                   variant="outline"
-                  className="text-yellow bg-gray-400 border-gray-600 hover:border-yellow-400 hover:text-yellow-400 px-10 py-7 text-xl rounded-2xl font-bold"
+                  className="text-white border-gray-600 bg-gray-900/50 hover:border-yellow-400 hover:text-yellow-400 px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-7 text-base sm:text-lg md:text-xl rounded-xl sm:rounded-2xl font-bold w-full"
                   onClick={() => navigate("/login")}
                 >
-                  <Smartphone className="w-6 h-6 mr-3" />
+                  <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
                   Book a Live Demo
                 </Button>
               </motion.div>
@@ -843,9 +947,9 @@ export default function Home() {
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.6 }}
               viewport={{ once: true }}
-              className="text-gray-500 mt-8 flex items-center justify-center gap-2"
+              className="text-gray-500 text-sm sm:text-base mt-6 sm:mt-8 flex items-center justify-center gap-2"
             >
-              <Lock className="w-4 h-4" />
+              <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
               Secure & GDPR compliant. Your data is always protected.
             </motion.p>
           </motion.div>
@@ -853,26 +957,26 @@ export default function Home() {
       </section>
 
       {/* ================= FOOTER ================= */}
-      <footer className="bg-black border-t border-gray-800 py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
+      <footer className="bg-black border-t border-gray-800 py-8 sm:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mb-8 sm:mb-12">
             <div>
-              <h1 className="text-2xl font-bold text-yellow-400 mb-6 flex items-center gap-2">
-                <Sparkles className="w-6 h-6" />
+              <h1 className="text-xl sm:text-2xl font-bold text-yellow-400 mb-4 sm:mb-6 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
                 DocXtract
               </h1>
-              <p className="text-gray-400">
+              <p className="text-gray-400 text-sm sm:text-base">
                 AI-powered document extraction for modern teams. Fast, accurate, and reliable.
               </p>
             </div>
             
             {["Product", "Company", "Resources", "Legal"].map((category) => (
               <div key={category}>
-                <h4 className="text-white font-semibold mb-6">{category}</h4>
-                <ul className="space-y-4">
+                <h4 className="text-white font-semibold mb-4 sm:mb-6 text-base sm:text-lg">{category}</h4>
+                <ul className="space-y-2 sm:space-y-4">
                   {["Features", "Pricing", "API Docs", "Status"].map((item) => (
                     <li key={item}>
-                      <a href="#" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                      <a href="#" className="text-gray-400 hover:text-yellow-400 transition-colors text-sm sm:text-base">
                         {item}
                       </a>
                     </li>
@@ -882,9 +986,9 @@ export default function Home() {
             ))}
           </div>
           
-          <div className="pt-8 border-t border-gray-800 text-center text-gray-500">
+          <div className="pt-6 sm:pt-8 border-t border-gray-800 text-center text-gray-500 text-sm sm:text-base">
             <p>© {new Date().getFullYear()} DocXtract AI. All rights reserved.</p>
-            <p className="mt-2 text-sm">Made with ❤️ for developers and businesses worldwide</p>
+            <p className="mt-1 sm:mt-2 text-xs sm:text-sm">Made with ❤️ for developers and businesses worldwide</p>
           </div>
         </div>
       </footer>
