@@ -13,7 +13,7 @@ import BusinessDashboard from "./pages/dashboard/BusinessDashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { useAuthStore } from "./store/authStore";
 import Queries from './pages/Queries'
-import Docs from './pages/Docs'
+import Docs from './pages/Docs1'
 import Experience from './pages/Experience'
 import Api from './pages/Api'
 const App = () => {
