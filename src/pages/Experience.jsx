@@ -96,7 +96,6 @@ import {
   Parentheses,
   Braces,
   Command,
-  // Add missing imports
   Lightbulb,
   Target as TargetIcon,
   TrendingUp as TrendingUpIcon,
@@ -105,7 +104,9 @@ import {
   Clock as ClockIcon,
   Shield as ShieldIcon,
   Database as DatabaseIcon,
-  Cpu as CpuIcon
+  Cpu as CpuIcon,
+  Menu,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -151,6 +152,7 @@ export default function Experience() {
     colorScheme: "amber",
     roundedCorners: "medium"
   });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // User activity data
   const userActivity = [
@@ -164,10 +166,10 @@ export default function Experience() {
 
   // Efficiency metrics
   const efficiencyMetrics = [
-    { metric: "Time Saved", value: "42h", change: "+15%", icon: <Clock className="w-5 h-5" />, color: "text-blue-400" },
-    { metric: "Documents Processed", value: "1,248", change: "+28%", icon: <FileText className="w-5 h-5" />, color: "text-green-400" },
-    { metric: "Accuracy Rate", value: "99.2%", change: "+2.4%", icon: <Target className="w-5 h-5" />, color: "text-yellow-400" },
-    { metric: "Cost Saved", value: "$2,450", change: "+32%", icon: <Wallet className="w-5 h-5" />, color: "text-emerald-400" }
+    { metric: "Time Saved", value: "42h", change: "+15%", icon: <Clock className="w-4 h-4 sm:w-5 sm:h-5" />, color: "text-blue-400" },
+    { metric: "Documents Processed", value: "1,248", change: "+28%", icon: <FileText className="w-4 h-4 sm:w-5 sm:h-5" />, color: "text-green-400" },
+    { metric: "Accuracy Rate", value: "99.2%", change: "+2.4%", icon: <Target className="w-4 h-4 sm:w-5 sm:h-5" />, color: "text-yellow-400" },
+    { metric: "Cost Saved", value: "$2,450", change: "+32%", icon: <Wallet className="w-4 h-4 sm:w-5 sm:h-5" />, color: "text-emerald-400" }
   ];
 
   // Personalization options
@@ -188,38 +190,38 @@ export default function Experience() {
   ];
 
   const layoutOptions = [
-    { id: "compact", name: "Compact", description: "More content, less space", icon: <Grid className="w-5 h-5" /> },
-    { id: "comfortable", name: "Comfortable", description: "Balanced spacing", icon: <Layout className="w-5 h-5" /> },
-    { id: "spacious", name: "Spacious", description: "Ample breathing room", icon: <Maximize2 className="w-5 h-5" /> }
+    { id: "compact", name: "Compact", description: "More content, less space", icon: <Grid className="w-4 h-4 sm:w-5 sm:h-5" /> },
+    { id: "comfortable", name: "Comfortable", description: "Balanced spacing", icon: <Layout className="w-4 h-4 sm:w-5 sm:h-5" /> },
+    { id: "spacious", name: "Spacious", description: "Ample breathing room", icon: <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5" /> }
   ];
 
   // Demo scenarios
   const demos = [
     { 
       id: "dashboard", 
-      name: "Dashboard Walkthrough", 
-      description: "Explore the main dashboard features",
+      name: "Dashboard", 
+      description: "Explore main dashboard features",
       duration: "2:30",
       steps: 5
     },
     { 
       id: "upload", 
-      name: "Document Upload", 
-      description: "Learn how to upload and process documents",
+      name: "Upload", 
+      description: "Upload and process documents",
       duration: "1:45",
       steps: 3
     },
     { 
       id: "api", 
-      name: "API Integration", 
-      description: "See how to integrate with our API",
+      name: "API", 
+      description: "Integrate with our API",
       duration: "3:15",
       steps: 4
     },
     { 
       id: "reports", 
-      name: "Report Generation", 
-      description: "Generate and analyze expenditure reports",
+      name: "Reports", 
+      description: "Generate expenditure reports",
       duration: "2:00",
       steps: 3
     }
@@ -319,7 +321,6 @@ export default function Experience() {
   };
 
   const handleImportSettings = () => {
-    // In a real app, this would open a file picker
     toast.info("Import feature would open file picker");
   };
 
@@ -349,40 +350,128 @@ export default function Experience() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/95 backdrop-blur-lg z-50 md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <motion.div
+              initial={{ y: -50 }}
+              animate={{ y: 0 }}
+              exit={{ y: -50 }}
+              className="p-6"
+            >
+              <div className="flex justify-between items-center mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500">
+                    <Sparkles className="w-6 h-6 text-black" />
+                  </div>
+                  <h1 className="text-xl font-bold text-white">Experience</h1>
+                </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 hover:bg-gray-800 rounded-lg"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                {["overview", "appearance", "preferences", "accessibility"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => {
+                      setActiveTab(tab);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full text-left p-4 rounded-lg ${
+                      activeTab === tab
+                        ? "bg-gradient-to-r from-yellow-400/20 to-orange-500/20 border border-yellow-400/30"
+                        : "bg-gray-800/50 hover:bg-gray-800"
+                    }`}
+                  >
+                    <span className="font-medium capitalize">{tab}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="space-y-4 mt-8">
+                <Button
+                  className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-black py-4"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleExportSettings();
+                  }}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export Settings
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="w-full border-gray-700 text-white py-4"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate("/dashboard");
+                  }}
+                >
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Dashboard
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-lg border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+      <header className="sticky top-0 z-40 bg-gray-900/95 backdrop-blur-lg border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <motion.div
                 whileHover={{ rotate: 10 }}
-                className="p-2 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500"
+                className="p-2 rounded-lg sm:rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500"
               >
-                <Sparkles className="w-6 h-6 text-black" />
+                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-black" />
               </motion.div>
               <div>
-                <h1 className="text-xl font-bold text-white">User Experience</h1>
-                <p className="text-gray-400 text-sm">Customize and optimize your workflow</p>
+                <h1 className="text-lg sm:text-xl font-bold text-white">User Experience</h1>
+                <p className="text-gray-400 text-xs sm:text-sm hidden sm:block">Customize and optimize your workflow</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-2 hover:bg-gray-800 rounded-lg"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            
+            {/* Desktop Buttons */}
+            <div className="hidden md:flex items-center gap-2 sm:gap-3">
               <Button
                 variant="outline"
                 size="sm"
-                className="border-gray-700 text-gray-300 hover:text-yellow-400"
+                className="border-gray-700 text-gray-300 hover:text-yellow-400 text-xs sm:text-sm"
                 onClick={() => navigate("/dashboard")}
               >
-                <ChevronLeft className="w-4 h-4 mr-1" />
-                Back to Dashboard
+                <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                Dashboard
               </Button>
               <Button
                 size="sm"
-                className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black"
+                className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black text-xs sm:text-sm"
                 onClick={handleExportSettings}
               >
-                <Download className="w-4 h-4 mr-1" />
-                Export Settings
+                <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                Export
               </Button>
             </div>
           </div>
@@ -390,110 +479,112 @@ export default function Experience() {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8">
         {/* Stats Overview */}
         <motion.div
           variants={fadeIn}
           initial="hidden"
           animate="visible"
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {efficiencyMetrics.map((metric, index) => (
               <motion.div
                 key={index}
                 variants={itemAnimation}
                 whileHover={{ y: -5 }}
-                className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6"
+                className="bg-gray-800/50 backdrop-blur-sm rounded-lg sm:rounded-xl border border-gray-700 p-3 sm:p-4 md:p-6"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-lg ${metric.color} bg-opacity-20`}>
+                <div className="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
+                  <div className={`p-1.5 sm:p-2 md:p-3 rounded-lg ${metric.color} bg-opacity-20`}>
                     {metric.icon}
                   </div>
-                  <Badge className="bg-green-500/20 text-green-400">
+                  <Badge className="bg-green-500/20 text-green-400 text-xs sm:text-sm">
                     {metric.change}
                   </Badge>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-1">{metric.value}</h3>
-                <p className="text-gray-400">{metric.metric}</p>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1">{metric.value}</h3>
+                <p className="text-gray-400 text-xs sm:text-sm md:text-base">{metric.metric}</p>
               </motion.div>
             ))}
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Left Column - Customization */}
           <div className="lg:col-span-2">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-8 bg-gray-800/50 p-1 rounded-lg">
-                <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700">
-                  <Compass className="w-4 h-4 mr-2" />
-                  Overview
+              <TabsList className="grid w-full grid-cols-4 mb-4 sm:mb-6 md:mb-8 bg-gray-800/50 p-0.5 sm:p-1 rounded-md sm:rounded-lg text-xs sm:text-sm">
+                <TabsTrigger value="overview" className="data-[state=active]:bg-gray-700 py-2 sm:py-3">
+                  <Compass className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="truncate">Overview</span>
                 </TabsTrigger>
-                <TabsTrigger value="appearance" className="data-[state=active]:bg-gray-700">
-                  <Palette className="w-4 h-4 mr-2" />
-                  Appearance
+                <TabsTrigger value="appearance" className="data-[state=active]:bg-gray-700 py-2 sm:py-3">
+                  <Palette className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="truncate">Appearance</span>
                 </TabsTrigger>
-                <TabsTrigger value="preferences" className="data-[state=active]:bg-gray-700">
-                  <SettingsIcon className="w-4 h-4 mr-2" />
-                  Preferences
+                <TabsTrigger value="preferences" className="data-[state=active]:bg-gray-700 py-2 sm:py-3">
+                  <SettingsIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="truncate">Preferences</span>
                 </TabsTrigger>
-                <TabsTrigger value="accessibility" className="data-[state=active]:bg-gray-700">
-                  <Eye className="w-4 h-4 mr-2" />
-                  Accessibility
+                <TabsTrigger value="accessibility" className="data-[state=active]:bg-gray-700 py-2 sm:py-3">
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="truncate">Accessibility</span>
                 </TabsTrigger>
               </TabsList>
 
               {/* Overview Tab */}
-              <TabsContent value="overview" className="space-y-6">
+              <TabsContent value="overview" className="space-y-4 sm:space-y-6">
                 <Card className="bg-gray-800/50 border-gray-700">
-                  <CardHeader>
-                    <CardTitle className="text-white">Your Experience Dashboard</CardTitle>
-                    <CardDescription className="text-gray-400">
+                  <CardHeader className="pb-3 sm:pb-4">
+                    <CardTitle className="text-white text-lg sm:text-xl">Your Experience Dashboard</CardTitle>
+                    <CardDescription className="text-gray-400 text-sm sm:text-base">
                       Track and optimize your workflow efficiency
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       {/* Performance Metrics */}
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-white">Performance Metrics</h3>
+                      <div className="space-y-3 sm:space-y-4">
+                        <h3 className="text-base sm:text-lg font-semibold text-white">Performance Metrics</h3>
                         {[
                           { label: "Efficiency", value: userStats.efficiency, color: "bg-gradient-to-r from-blue-500 to-cyan-500" },
                           { label: "Accuracy", value: userStats.accuracy, color: "bg-gradient-to-r from-green-500 to-emerald-500" },
                           { label: "Speed", value: userStats.speed, color: "bg-gradient-to-r from-yellow-500 to-orange-500" },
                           { label: "Satisfaction", value: userStats.satisfaction, color: "bg-gradient-to-r from-purple-500 to-pink-500" }
                         ].map((metric, index) => (
-                          <div key={index} className="space-y-2">
+                          <div key={index} className="space-y-1.5 sm:space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-gray-300">{metric.label}</span>
-                              <span className="font-semibold text-white">{metric.value}%</span>
+                              <span className="text-gray-300 text-sm sm:text-base">{metric.label}</span>
+                              <span className="font-semibold text-white text-sm sm:text-base">{metric.value}%</span>
                             </div>
-                            <Progress value={metric.value} className="h-2" />
+                            <Progress value={metric.value} className="h-1.5 sm:h-2" />
                           </div>
                         ))}
                       </div>
 
                       {/* Recent Activity */}
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-white">Recent Activity</h3>
-                        <div className="space-y-3">
+                      <div className="space-y-3 sm:space-y-4">
+                        <h3 className="text-base sm:text-lg font-semibold text-white">Recent Activity</h3>
+                        <div className="space-y-2 sm:space-y-3">
                           {userActivity.slice(0, 4).map((activity, index) => (
-                            <div key={index} className="flex items-center justify-between p-3 bg-gray-900/30 rounded-lg border border-gray-700">
-                              <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-lg bg-gray-800">
-                                  <Clock className="w-4 h-4" />
+                            <div key={index} className="flex items-center justify-between p-2 sm:p-3 bg-gray-900/30 rounded-lg border border-gray-700">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="p-1.5 sm:p-2 rounded-lg bg-gray-800">
+                                  <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                                 </div>
-                                <div>
-                                  <h4 className="font-medium text-white">{activity.action}</h4>
-                                  <p className="text-gray-400 text-sm">{activity.time} • {activity.device || activity.type}</p>
+                                <div className="min-w-0 flex-1">
+                                  <h4 className="font-medium text-white text-sm sm:text-base truncate">{activity.action}</h4>
+                                  <p className="text-gray-400 text-xs sm:text-sm truncate">
+                                    {activity.time} • {activity.device || activity.type}
+                                  </p>
                                 </div>
                               </div>
                               <div className="text-right">
-                                <p className="font-semibold text-white">
+                                <p className="font-semibold text-white text-sm sm:text-base">
                                   {activity.count || activity.duration || activity.accuracy}
                                 </p>
-                                <p className="text-gray-400 text-sm">
+                                <p className="text-gray-400 text-xs sm:text-sm truncate">
                                   {activity.size || activity.views || "Completed"}
                                 </p>
                               </div>
@@ -503,22 +594,22 @@ export default function Experience() {
                       </div>
 
                       {/* Quick Actions */}
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
                         <Button
                           variant="outline"
-                          className="border-gray-700 text-gray-300 hover:text-yellow-400 h-auto py-4"
+                          className="border-gray-700 text-gray-300 hover:text-yellow-400 h-auto py-2 sm:py-3 text-xs sm:text-sm"
                           onClick={() => setActiveTab("appearance")}
                         >
-                          <Palette className="w-5 h-5 mr-2" />
-                          Customize Theme
+                          <Palette className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                          <span className="truncate">Customize Theme</span>
                         </Button>
                         <Button
                           variant="outline"
-                          className="border-gray-700 text-gray-300 hover:text-yellow-400 h-auto py-4"
+                          className="border-gray-700 text-gray-300 hover:text-yellow-400 h-auto py-2 sm:py-3 text-xs sm:text-sm"
                           onClick={() => setActiveTab("accessibility")}
                         >
-                          <Eye className="w-5 h-5 mr-2" />
-                          Accessibility Settings
+                          <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                          <span className="truncate">Accessibility</span>
                         </Button>
                       </div>
                     </div>
@@ -527,48 +618,48 @@ export default function Experience() {
               </TabsContent>
 
               {/* Appearance Tab */}
-              <TabsContent value="appearance" className="space-y-6">
+              <TabsContent value="appearance" className="space-y-4 sm:space-y-6">
                 <Card className="bg-gray-800/50 border-gray-700">
-                  <CardHeader>
-                    <CardTitle className="text-white">Theme & Colors</CardTitle>
-                    <CardDescription className="text-gray-400">
+                  <CardHeader className="pb-3 sm:pb-4">
+                    <CardTitle className="text-white text-lg sm:text-xl">Theme & Colors</CardTitle>
+                    <CardDescription className="text-gray-400 text-sm sm:text-base">
                       Choose how DocXtract looks
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 sm:space-y-6">
                     {/* Theme Selection */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-white">Select Theme</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Select Theme</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
                         {themes.map((themeOption) => (
                           <button
                             key={themeOption.id}
                             onClick={() => handleThemeChange(themeOption.id)}
-                            className={`p-4 rounded-xl border-2 text-center transition-all ${
+                            className={`p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border-2 text-center transition-all ${
                               theme === themeOption.id
                                 ? "border-yellow-400 bg-yellow-400/10"
                                 : "border-gray-700 hover:border-gray-600"
                             }`}
                           >
-                            <div className="text-2xl mb-2">{themeOption.icon}</div>
-                            <h4 className="font-semibold text-white">{themeOption.name}</h4>
-                            <p className="text-gray-400 text-sm mt-1">{themeOption.description}</p>
+                            <div className="text-xl sm:text-2xl mb-1 sm:mb-2">{themeOption.icon}</div>
+                            <h4 className="font-semibold text-white text-xs sm:text-sm md:text-base">{themeOption.name}</h4>
+                            <p className="text-gray-400 text-xs sm:text-xs md:text-sm mt-0.5 sm:mt-1 line-clamp-2">{themeOption.description}</p>
                           </button>
                         ))}
                       </div>
                     </div>
 
                     {/* Color Scheme */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-white">Accent Color</h3>
-                      <div className="flex gap-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Accent Color</h3>
+                      <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4">
                         {colorSchemes.map((scheme) => (
                           <button
                             key={scheme.id}
                             onClick={() => handleCustomizationChange("colorScheme", scheme.id)}
-                            className={`w-12 h-12 rounded-lg ${scheme.color} border-2 ${
+                            className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg ${scheme.color} border-2 ${
                               customization.colorScheme === scheme.id
-                                ? "border-white ring-2 ring-white ring-offset-2 ring-offset-gray-800"
+                                ? "border-white ring-1 sm:ring-2 ring-white ring-offset-1 sm:ring-offset-2 ring-offset-gray-800"
                                 : "border-transparent"
                             }`}
                             title={scheme.name}
@@ -578,40 +669,41 @@ export default function Experience() {
                     </div>
 
                     {/* Layout Options */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-white">Layout Density</h3>
-                      <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Layout Density</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
                         {layoutOptions.map((layout) => (
                           <button
                             key={layout.id}
                             onClick={() => handleCustomizationChange("density", layout.id)}
-                            className={`p-4 rounded-xl border-2 text-center transition-all ${
+                            className={`p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border-2 text-center transition-all ${
                               customization.density === layout.id
                                 ? "border-yellow-400 bg-yellow-400/10"
                                 : "border-gray-700 hover:border-gray-600"
                             }`}
                           >
-                            <div className="flex justify-center mb-2">
-                              <div className="p-2 rounded-lg bg-gray-800">
+                            <div className="flex justify-center mb-1 sm:mb-2">
+                              <div className="p-1 sm:p-2 rounded-lg bg-gray-800">
                                 {layout.icon}
                               </div>
                             </div>
-                            <h4 className="font-semibold text-white">{layout.name}</h4>
-                            <p className="text-gray-400 text-sm mt-1">{layout.description}</p>
+                            <h4 className="font-semibold text-white text-xs sm:text-sm md:text-base">{layout.name}</h4>
+                            <p className="text-gray-400 text-xs sm:text-xs md:text-sm mt-0.5 sm:mt-1 line-clamp-2">{layout.description}</p>
                           </button>
                         ))}
                       </div>
                     </div>
 
                     {/* Sidebar Position */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-white">Sidebar Position</h3>
-                      <div className="flex gap-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Sidebar Position</h3>
+                      <div className="flex flex-wrap gap-2">
                         {["left", "right", "top", "hidden"].map((position) => (
                           <Button
                             key={position}
                             variant={customization.sidebarPosition === position ? "default" : "outline"}
-                            className={`${
+                            size="sm"
+                            className={`text-xs sm:text-sm ${
                               customization.sidebarPosition === position
                                 ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-black"
                                 : "border-gray-700 text-gray-400 hover:text-yellow-400"
@@ -628,17 +720,17 @@ export default function Experience() {
               </TabsContent>
 
               {/* Preferences Tab */}
-              <TabsContent value="preferences" className="space-y-6">
+              <TabsContent value="preferences" className="space-y-4 sm:space-y-6">
                 <Card className="bg-gray-800/50 border-gray-700">
-                  <CardHeader>
-                    <CardTitle className="text-white">Preferences</CardTitle>
-                    <CardDescription className="text-gray-400">
+                  <CardHeader className="pb-3 sm:pb-4">
+                    <CardTitle className="text-white text-lg sm:text-xl">Preferences</CardTitle>
+                    <CardDescription className="text-gray-400 text-sm sm:text-base">
                       Configure your workflow preferences
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 sm:space-y-6">
                     {/* Toggles */}
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       {[
                         { label: "Enable Animations", description: "Smooth transitions and effects", state: animations, setter: setAnimations },
                         { label: "Sound Effects", description: "Audio feedback for actions", state: soundEffects, setter: setSoundEffects },
@@ -647,42 +739,42 @@ export default function Experience() {
                         { label: "Notifications", description: "Receive updates and alerts", state: notifications, setter: setNotifications }
                       ].map((pref, index) => (
                         <div key={index} className="flex items-center justify-between">
-                          <div className="space-y-1">
-                            <Label className="text-white">{pref.label}</Label>
-                            <p className="text-gray-400 text-sm">{pref.description}</p>
+                          <div className="space-y-0.5 sm:space-y-1">
+                            <Label className="text-white text-sm sm:text-base">{pref.label}</Label>
+                            <p className="text-gray-400 text-xs sm:text-sm">{pref.description}</p>
                           </div>
                           <Switch
                             checked={pref.state}
                             onCheckedChange={pref.setter}
-                            className="data-[state=checked]:bg-yellow-500"
+                            className="data-[state=checked]:bg-yellow-500 scale-90 sm:scale-100"
                           />
                         </div>
                       ))}
                     </div>
 
                     {/* Performance Mode */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-white">Performance Mode</h3>
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Performance Mode</h3>
                       <Select value={performanceMode} onValueChange={setPerformanceMode}>
-                        <SelectTrigger className="bg-gray-900 border-gray-700 text-white">
+                        <SelectTrigger className="bg-gray-900 border-gray-700 text-white text-sm sm:text-base">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-gray-800 border-gray-700">
-                          <SelectItem value="power-saver" className="text-white">
+                          <SelectItem value="power-saver" className="text-white text-sm sm:text-base">
                             <div className="flex items-center gap-2">
-                              <Battery className="w-4 h-4 text-green-400" />
+                              <Battery className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
                               Power Saver
                             </div>
                           </SelectItem>
-                          <SelectItem value="balanced" className="text-white">
+                          <SelectItem value="balanced" className="text-white text-sm sm:text-base">
                             <div className="flex items-center gap-2">
-                              <Activity className="w-4 h-4 text-yellow-400" />
+                              <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
                               Balanced
                             </div>
                           </SelectItem>
-                          <SelectItem value="performance" className="text-white">
+                          <SelectItem value="performance" className="text-white text-sm sm:text-base">
                             <div className="flex items-center gap-2">
-                              <Zap className="w-4 h-4 text-red-400" />
+                              <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
                               Performance
                             </div>
                           </SelectItem>
@@ -691,34 +783,32 @@ export default function Experience() {
                     </div>
 
                     {/* Language & Region */}
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-white">Language</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                      <div className="space-y-3 sm:space-y-4">
+                        <h3 className="text-base sm:text-lg font-semibold text-white">Language</h3>
                         <Select value={language} onValueChange={setLanguage}>
-                          <SelectTrigger className="bg-gray-900 border-gray-700 text-white">
+                          <SelectTrigger className="bg-gray-900 border-gray-700 text-white text-sm sm:text-base">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-gray-800 border-gray-700">
-                            <SelectItem value="en" className="text-white">English</SelectItem>
-                            <SelectItem value="es" className="text-white">Español</SelectItem>
-                            <SelectItem value="fr" className="text-white">Français</SelectItem>
-                            <SelectItem value="de" className="text-white">Deutsch</SelectItem>
-                            <SelectItem value="ja" className="text-white">日本語</SelectItem>
+                            <SelectItem value="en" className="text-white text-sm sm:text-base">English</SelectItem>
+                            <SelectItem value="es" className="text-white text-sm sm:text-base">Español</SelectItem>
+                            <SelectItem value="fr" className="text-white text-sm sm:text-base">Français</SelectItem>
+                            <SelectItem value="de" className="text-white text-sm sm:text-base">Deutsch</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-white">Timezone</h3>
+                      <div className="space-y-3 sm:space-y-4">
+                        <h3 className="text-base sm:text-lg font-semibold text-white">Timezone</h3>
                         <Select value={timezone} onValueChange={setTimezone}>
-                          <SelectTrigger className="bg-gray-900 border-gray-700 text-white">
+                          <SelectTrigger className="bg-gray-900 border-gray-700 text-white text-sm sm:text-base">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-gray-800 border-gray-700">
-                            <SelectItem value="UTC" className="text-white">UTC</SelectItem>
-                            <SelectItem value="EST" className="text-white">EST</SelectItem>
-                            <SelectItem value="PST" className="text-white">PST</SelectItem>
-                            <SelectItem value="CET" className="text-white">CET</SelectItem>
-                            <SelectItem value="JST" className="text-white">JST</SelectItem>
+                            <SelectItem value="UTC" className="text-white text-sm sm:text-base">UTC</SelectItem>
+                            <SelectItem value="EST" className="text-white text-sm sm:text-base">EST</SelectItem>
+                            <SelectItem value="PST" className="text-white text-sm sm:text-base">PST</SelectItem>
+                            <SelectItem value="CET" className="text-white text-sm sm:text-base">CET</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -728,26 +818,28 @@ export default function Experience() {
               </TabsContent>
 
               {/* Accessibility Tab */}
-              <TabsContent value="accessibility" className="space-y-6">
+              <TabsContent value="accessibility" className="space-y-4 sm:space-y-6">
                 <Card className="bg-gray-800/50 border-gray-700">
-                  <CardHeader>
-                    <CardTitle className="text-white">Accessibility</CardTitle>
-                    <CardDescription className="text-gray-400">
+                  <CardHeader className="pb-3 sm:pb-4">
+                    <CardTitle className="text-white text-lg sm:text-xl">Accessibility</CardTitle>
+                    <CardDescription className="text-gray-400 text-sm sm:text-base">
                       Make DocXtract work better for you
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 sm:space-y-6">
                     {/* Visual Adjustments */}
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       {[
                         { label: "Font Size", value: fontSize[0], setter: setFontSize, min: 12, max: 24, step: 1 },
                         { label: "Contrast", value: contrast[0], setter: setContrast, min: 0, max: 100, step: 1 },
                         { label: "Saturation", value: saturation[0], setter: setSaturation, min: 0, max: 100, step: 1 }
                       ].map((slider, index) => (
-                        <div key={index} className="space-y-4">
+                        <div key={index} className="space-y-2 sm:space-y-3">
                           <div className="flex items-center justify-between">
-                            <Label className="text-white">{slider.label}</Label>
-                            <span className="text-gray-300 font-mono">{slider.value}{slider.label === "Font Size" ? "px" : "%"}</span>
+                            <Label className="text-white text-sm sm:text-base">{slider.label}</Label>
+                            <span className="text-gray-300 font-mono text-sm sm:text-base">
+                              {slider.value}{slider.label === "Font Size" ? "px" : "%"}
+                            </span>
                           </div>
                           <Slider
                             value={[slider.value]}
@@ -762,9 +854,9 @@ export default function Experience() {
                     </div>
 
                     {/* Keyboard Shortcuts */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-white">Keyboard Shortcuts</h3>
-                      <div className="space-y-2">
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Keyboard Shortcuts</h3>
+                      <div className="space-y-1.5 sm:space-y-2">
                         {[
                           { key: "Ctrl/Cmd + K", action: "Open command palette" },
                           { key: "Ctrl/Cmd + S", action: "Save document" },
@@ -772,33 +864,33 @@ export default function Experience() {
                           { key: "Ctrl/Cmd + D", action: "Open dashboard" },
                           { key: "Ctrl/Cmd + /", action: "Show shortcuts" }
                         ].map((shortcut, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 bg-gray-900/30 rounded-lg">
-                            <kbd className="px-2 py-1 bg-gray-800 rounded text-sm font-mono text-gray-300">
+                          <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-2 sm:p-3 bg-gray-900/30 rounded-lg">
+                            <kbd className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-800 rounded text-xs sm:text-sm font-mono text-gray-300 mb-1 sm:mb-0">
                               {shortcut.key}
                             </kbd>
-                            <span className="text-gray-300">{shortcut.action}</span>
+                            <span className="text-gray-300 text-xs sm:text-sm">{shortcut.action}</span>
                           </div>
                         ))}
                       </div>
                     </div>
 
                     {/* Screen Reader */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-white">Screen Reader Support</h3>
-                      <div className="space-y-2">
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="text-base sm:text-lg font-semibold text-white">Screen Reader Support</h3>
+                      <div className="space-y-1.5 sm:space-y-2">
                         <div className="flex items-center justify-between">
-                          <div className="space-y-1">
-                            <Label className="text-white">Enhanced ARIA Labels</Label>
-                            <p className="text-gray-400 text-sm">Improved screen reader descriptions</p>
+                          <div className="space-y-0.5">
+                            <Label className="text-white text-sm sm:text-base">Enhanced ARIA Labels</Label>
+                            <p className="text-gray-400 text-xs sm:text-sm">Improved screen reader descriptions</p>
                           </div>
-                          <Switch className="data-[state=checked]:bg-yellow-500" defaultChecked />
+                          <Switch className="data-[state=checked]:bg-yellow-500 scale-90 sm:scale-100" defaultChecked />
                         </div>
                         <div className="flex items-center justify-between">
-                          <div className="space-y-1">
-                            <Label className="text-white">Focus Indicators</Label>
-                            <p className="text-gray-400 text-sm">Highlight focused elements</p>
+                          <div className="space-y-0.5">
+                            <Label className="text-white text-sm sm:text-base">Focus Indicators</Label>
+                            <p className="text-gray-400 text-xs sm:text-sm">Highlight focused elements</p>
                           </div>
-                          <Switch className="data-[state=checked]:bg-yellow-500" defaultChecked />
+                          <Switch className="data-[state=checked]:bg-yellow-500 scale-90 sm:scale-100" defaultChecked />
                         </div>
                       </div>
                     </div>
@@ -813,27 +905,28 @@ export default function Experience() {
               initial="hidden"
               animate="visible"
               transition={{ delay: 0.2 }}
-              className="mt-8"
+              className="mt-4 sm:mt-6 md:mt-8"
             >
               <Card className="bg-gray-800/50 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Play className="w-5 h-5 text-yellow-400" />
+                <CardHeader className="pb-3 sm:pb-4">
+                  <CardTitle className="text-white text-lg sm:text-xl flex items-center gap-2">
+                    <Play className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
                     Interactive Demo
                   </CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardDescription className="text-gray-400 text-sm sm:text-base">
                     Experience DocXtract features in action
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     {/* Demo Selection */}
-                    <div className="flex gap-2 overflow-x-auto pb-4">
+                    <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-2 sm:pb-4 scrollbar-thin">
                       {demos.map((demo) => (
                         <Button
                           key={demo.id}
                           variant={activeDemo === demo.id ? "default" : "outline"}
-                          className={`whitespace-nowrap ${
+                          size="sm"
+                          className={`whitespace-nowrap text-xs sm:text-sm ${
                             activeDemo === demo.id
                               ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-black"
                               : "border-gray-700 text-gray-400 hover:text-yellow-400"
@@ -849,63 +942,63 @@ export default function Experience() {
                     </div>
 
                     {/* Demo Preview */}
-                    <div className="bg-gray-900 rounded-xl border border-gray-700 p-6">
-                      <div className="flex items-center justify-between mb-6">
-                        <div>
-                          <h3 className="font-semibold text-white">
+                    <div className="bg-gray-900 rounded-lg sm:rounded-xl border border-gray-700 p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6">
+                        <div className="mb-2 sm:mb-0">
+                          <h3 className="font-semibold text-white text-sm sm:text-base">
                             {demos.find(d => d.id === activeDemo)?.name}
                           </h3>
-                          <p className="text-gray-400 text-sm">
+                          <p className="text-gray-400 text-xs sm:text-sm line-clamp-2">
                             {demos.find(d => d.id === activeDemo)?.description}
                           </p>
                         </div>
-                        <Badge className="bg-gray-700 text-gray-300">
+                        <Badge className="bg-gray-700 text-gray-300 text-xs sm:text-sm self-start sm:self-center">
                           {demos.find(d => d.id === activeDemo)?.duration}
                         </Badge>
                       </div>
 
                       {/* Progress Bar */}
-                      <div className="space-y-2 mb-6">
+                      <div className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6">
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-300">Progress</span>
-                          <span className="text-gray-300 font-mono">{demoProgress}%</span>
+                          <span className="text-gray-300 text-xs sm:text-sm">Progress</span>
+                          <span className="text-gray-300 font-mono text-xs sm:text-sm">{demoProgress}%</span>
                         </div>
-                        <Progress value={demoProgress} className="h-2" />
+                        <Progress value={demoProgress} className="h-1.5 sm:h-2" />
                       </div>
 
                       {/* Controls */}
-                      <div className="flex items-center justify-center gap-4">
+                      <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-4">
                         <Button
                           variant="outline"
                           size="icon"
-                          className="border-gray-700 text-gray-400 hover:text-yellow-400"
+                          className="border-gray-700 text-gray-400 hover:text-yellow-400 h-8 w-8 sm:h-10 sm:w-10"
                           onClick={resetDemo}
                         >
-                          <SkipBack className="w-4 h-4" />
+                          <SkipBack className="w-3 h-3 sm:w-4 sm:h-4" />
                         </Button>
                         <Button
-                          className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black px-6"
+                          className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
                           onClick={toggleDemo}
                         >
                           {isPlayingDemo ? (
                             <>
-                              <Pause className="w-4 h-4 mr-2" />
-                              Pause
+                              <Pause className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                              <span className="hidden sm:inline">Pause</span>
                             </>
                           ) : (
                             <>
-                              <Play className="w-4 h-4 mr-2" />
-                              Play Demo
+                              <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                              <span className="hidden sm:inline">Play Demo</span>
                             </>
                           )}
                         </Button>
                         <Button
                           variant="outline"
                           size="icon"
-                          className="border-gray-700 text-gray-400 hover:text-yellow-400"
+                          className="border-gray-700 text-gray-400 hover:text-yellow-400 h-8 w-8 sm:h-10 sm:w-10"
                           onClick={() => setDemoProgress(100)}
                         >
-                          <SkipForward className="w-4 h-4" />
+                          <SkipForward className="w-3 h-3 sm:w-4 sm:h-4" />
                         </Button>
                       </div>
                     </div>
@@ -916,50 +1009,50 @@ export default function Experience() {
           </div>
 
           {/* Right Column - Sidebar */}
-          <div className="space-y-8">
+          <div className="space-y-4 sm:space-y-6 lg:space-y-8">
             {/* User Profile */}
             <Card className="bg-gray-800/50 border-gray-700">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4 mb-6">
-                  <Avatar className="h-16 w-16">
-                    <AvatarFallback className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-xl">
+              <CardContent className="pt-4 sm:pt-6">
+                <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <Avatar className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16">
+                    <AvatarFallback className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-lg sm:text-xl">
                       UX
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <h3 className="font-bold text-white">Experience Settings</h3>
-                    <p className="text-gray-400 text-sm">Personalized for you</p>
-                    <Badge className="mt-2 bg-yellow-500/20 text-yellow-400">
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      Premium Experience
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-bold text-white text-sm sm:text-base md:text-lg truncate">Experience Settings</h3>
+                    <p className="text-gray-400 text-xs sm:text-sm truncate">Personalized for you</p>
+                    <Badge className="mt-1 sm:mt-2 bg-yellow-500/20 text-yellow-400 text-xs">
+                      <Sparkles className="w-2 h-2 sm:w-3 sm:h-3 mr-1" />
+                      Premium
                     </Badge>
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-2 sm:space-y-3">
                   <Button
                     variant="outline"
-                    className="w-full border-gray-700 text-gray-300 hover:text-yellow-400 justify-start"
+                    className="w-full border-gray-700 text-gray-300 hover:text-yellow-400 justify-start py-2 sm:py-3 text-xs sm:text-sm"
                     onClick={handleExportSettings}
                   >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export Settings
+                    <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">Export Settings</span>
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full border-gray-700 text-gray-300 hover:text-yellow-400 justify-start"
+                    className="w-full border-gray-700 text-gray-300 hover:text-yellow-400 justify-start py-2 sm:py-3 text-xs sm:text-sm"
                     onClick={handleImportSettings}
                   >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Import Settings
+                    <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">Import Settings</span>
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full border-gray-700 text-red-400 hover:text-red-300 hover:border-red-400/50 justify-start"
+                    className="w-full border-gray-700 text-red-400 hover:text-red-300 hover:border-red-400/50 justify-start py-2 sm:py-3 text-xs sm:text-sm"
                     onClick={resetToDefaults}
                   >
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Reset to Defaults
+                    <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">Reset to Defaults</span>
                   </Button>
                 </div>
               </CardContent>
@@ -967,24 +1060,24 @@ export default function Experience() {
 
             {/* Quick Stats */}
             <Card className="bg-gray-800/50 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Your Impact</CardTitle>
+              <CardHeader className="pb-3 sm:pb-4">
+                <CardTitle className="text-white text-sm sm:text-base md:text-lg">Your Impact</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-2 sm:space-y-3 md:space-y-4">
                 {[
-                  { label: "Documents Processed", value: "1,248", icon: <FileText className="w-4 h-4" /> },
-                  { label: "Time Saved", value: "42h", icon: <Clock className="w-4 h-4" /> },
-                  { label: "Cost Saved", value: "$2,450", icon: <Wallet className="w-4 h-4" /> },
-                  { label: "Accuracy Rate", value: "99.2%", icon: <Target className="w-4 h-4" /> }
+                  { label: "Documents Processed", value: "1,248", icon: <FileText className="w-3 h-3 sm:w-4 sm:h-4" /> },
+                  { label: "Time Saved", value: "42h", icon: <Clock className="w-3 h-3 sm:w-4 sm:h-4" /> },
+                  { label: "Cost Saved", value: "$2,450", icon: <Wallet className="w-3 h-3 sm:w-4 sm:h-4" /> },
+                  { label: "Accuracy Rate", value: "99.2%", icon: <Target className="w-3 h-3 sm:w-4 sm:h-4" /> }
                 ].map((stat, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-900/30 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gray-800">
+                  <div key={index} className="flex items-center justify-between p-2 sm:p-3 bg-gray-900/30 rounded-lg">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                      <div className="p-1 sm:p-2 rounded-lg bg-gray-800 flex-shrink-0">
                         {stat.icon}
                       </div>
-                      <span className="text-gray-300">{stat.label}</span>
+                      <span className="text-gray-300 text-xs sm:text-sm truncate">{stat.label}</span>
                     </div>
-                    <span className="font-semibold text-white">{stat.value}</span>
+                    <span className="font-semibold text-white text-xs sm:text-sm md:text-base flex-shrink-0 ml-2">{stat.value}</span>
                   </div>
                 ))}
               </CardContent>
@@ -992,13 +1085,13 @@ export default function Experience() {
 
             {/* Tips & Tricks */}
             <Card className="bg-gradient-to-br from-yellow-400/10 via-gray-800/50 to-orange-500/10 border border-yellow-400/20">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-yellow-400" />
+              <CardHeader className="pb-3 sm:pb-4">
+                <CardTitle className="text-white text-sm sm:text-base md:text-lg flex items-center gap-2">
+                  <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-yellow-400" />
                   Pro Tips
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-2 sm:space-y-3 md:space-y-4">
                 {[
                   "Use keyboard shortcuts for faster navigation",
                   "Enable auto-save to never lose your work",
@@ -1006,61 +1099,63 @@ export default function Experience() {
                   "Use batch processing for multiple documents",
                   "Schedule reports during off-peak hours"
                 ].map((tip, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="w-2 h-2 rounded-full bg-yellow-400 mt-2 flex-shrink-0" />
-                    <p className="text-gray-300 text-sm">{tip}</p>
+                  <div key={index} className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 mt-1.5 sm:mt-2 flex-shrink-0" />
+                    <p className="text-gray-300 text-xs sm:text-sm">{tip}</p>
                   </div>
                 ))}
                 <Button
                   variant="outline"
-                  className="w-full mt-4 border-yellow-400/50 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10"
+                  className="w-full mt-2 sm:mt-3 md:mt-4 border-yellow-400/50 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 py-2 sm:py-3 text-xs sm:text-sm"
                   onClick={() => navigate("/docs")}
                 >
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  Learn More Tips
+                  <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="truncate">Learn More Tips</span>
                 </Button>
               </CardContent>
             </Card>
 
             {/* Feedback */}
             <Card className="bg-gray-800/50 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Share Feedback</CardTitle>
-                <CardDescription className="text-gray-400">
+              <CardHeader className="pb-3 sm:pb-4">
+                <CardTitle className="text-white text-sm sm:text-base md:text-lg">Share Feedback</CardTitle>
+                <CardDescription className="text-gray-400 text-xs sm:text-sm">
                   Help us improve your experience
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-2 sm:space-y-3">
                 <Button
-                  className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black"
+                  className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black py-2 sm:py-3 text-xs sm:text-sm"
                   onClick={() => navigate("/feedback")}
                 >
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Submit Feedback
+                  <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="truncate">Submit Feedback</span>
                 </Button>
-                <div className="flex gap-2">
+                <div className="flex gap-1 sm:gap-2">
                   <Button
                     variant="outline"
-                    className="flex-1 border-gray-700 text-gray-400 hover:text-green-400 hover:border-green-400/50"
+                    size="sm"
+                    className="flex-1 border-gray-700 text-gray-400 hover:text-green-400 hover:border-green-400/50 text-xs sm:text-sm"
                   >
-                    <ThumbsUp className="w-4 h-4 mr-2" />
+                    <ThumbsUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     Like
                   </Button>
                   <Button
                     variant="outline"
-                    className="flex-1 border-gray-700 text-gray-400 hover:text-red-400 hover:border-red-400/50"
+                    size="sm"
+                    className="flex-1 border-gray-700 text-gray-400 hover:text-red-400 hover:border-red-400/50 text-xs sm:text-sm"
                   >
-                    <ThumbsDown className="w-4 h-4 mr-2" />
+                    <ThumbsDown className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     Dislike
                   </Button>
                 </div>
                 <Button
                   variant="outline"
-                  className="w-full border-gray-700 text-gray-400 hover:text-yellow-400"
+                  className="w-full border-gray-700 text-gray-400 hover:text-yellow-400 py-2 sm:py-3 text-xs sm:text-sm"
                   onClick={() => navigate("/queries")}
                 >
-                  <HelpCircle className="w-4 h-4 mr-2" />
-                  Get Help
+                  <HelpCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="truncate">Get Help</span>
                 </Button>
               </CardContent>
             </Card>
